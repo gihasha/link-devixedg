@@ -1,50 +1,32 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const overlay = document.getElementById('overlay');
-    const numberInput = document.getElementById('numberInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const peerWebFrame = document.getElementById('peerWebFrame');
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
 
-    // පෙයර් වෙබ් එක පූර්ණයෙන් ලෝඩ් වූ පසු
-    peerWebFrame.addEventListener('load', function() {
-        console.log('PeerWeb අන්තර්ගතය ලෝඩ් විය');
-    });
+app.use(bodyParser.json());
 
-    sendBtn.addEventListener('click', function() {
-        const number = numberInput.value;
-        
-        if (number) {
-            // පෙයර් වෙබ් එකේ input field සොයා අංකය ඇතුළත් කරන්න
-            const peerWebDocument = peerWebFrame.contentDocument || peerWebFrame.contentWindow.document;
-            const inputField = peerWebDocument.querySelector('input[type="text"]');
-            
-            if (inputField) {
-                inputField.value = number;
-                
-                // පෙයර් වෙබ් එකේ submit බටන් සොයා ඔබන්න
-                const submitButton = peerWebDocument.querySelector('button[type="submit"]');
-                
-                if (submitButton) {
-                    // අතුරු මුහුණත සැඟවීම
-                    overlay.classList.add('hidden');
-                    
-                    // Submit බටන් ඔබන්න (පෙයර් කේතය ජනනය වනු ඇත)
-                    submitButton.click();
-                    
-                    // 100 වතාවක් ස්වයංක්රීයව ඔබන්න
-                    for (let i = 1; i <= 100; i++) {
-                        setTimeout(() => {
-                            submitButton.click();
-                            console.log(`ස්වයංක්රීය submit #${i}`);
-                        }, i * 300);
-                    }
-                } else {
-                    alert('Submit බටන් සොයා ගැනීමට නොහැකි විය');
-                }
-            } else {
-                alert('ආදාන ක්ෂේත්රය සොයා ගැනීමට නොහැකි විය');
-            }
-        } else {
-            alert('කරුණාකර වලංගු අංකයක් ඇතුළත් කරන්න');
-        }
+// Example backend route to handle pair
+app.post('/pair', (req, res) => {
+    const { number } = req.body;
+    
+    if (!number) {
+        return res.status(400).send('Phone number is missing.');
+    }
+
+    // Logic for pairing code generation (you can customize it)
+    const pairCode = generatePairCode(number);  // Custom function to generate pairing code
+
+    res.json({
+        success: true,
+        pairCode,  // Sending back pairing code if needed
     });
+});
+
+// Example function to generate pair code (you can customize it)
+function generatePairCode(number) {
+    return `P-${Math.floor(Math.random() * 1000000)}`;
+}
+
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
 });
