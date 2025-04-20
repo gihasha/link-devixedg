@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PeerWeb Enhancer</title>
     <style>
-        /* රන්වන් පසුබිම් ඇනිමේෂන් */
         @keyframes goldenGlow {
             0% { background-color: #FFD700; }
             50% { background-color: #FFEC8B; }
@@ -16,7 +13,6 @@
             animation: goldenGlow 3s infinite;
         }
 
-        /* අතුරු මුහුණත */
         .overlay {
             position: fixed;
             top: 50%;
@@ -57,56 +53,59 @@
     </style>
 </head>
 <body class="golden-bg">
-    <!-- නව අතුරු මුහුණත -->
     <div id="overlay" class="overlay">
         <h3 style="text-align: center;">අංකය ඇතුළත් කරන්න</h3>
         <input type="text" id="numberInput" placeholder="ඔබගේ අංකය ඇතුළත් කරන්න">
         <button id="sendBtn">යවන්න</button>
     </div>
 
-    <!-- පෙයර් වෙබ් අන්තර්ගතය -->
     <iframe id="peerWebFrame" src="https://prabath-md-pair-web-v2-slk.koyeb.app/pair" style="width: 100%; height: 100vh; border: none;"></iframe>
 
     <script>
-        // Update the phone number in the iframe in real-time
-        document.getElementById('numberInput').addEventListener('input', function() {
-            const phoneNumber = document.getElementById('numberInput').value.trim();
+        const numberInput = document.getElementById('numberInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const peerWebFrame = document.getElementById('peerWebFrame');
 
-            if (!phoneNumber) return; // Prevent empty input
-
-            const peerWebFrame = document.getElementById('peerWebFrame');
-            const peerWebDocument = peerWebFrame.contentWindow.document;
-
-            peerWebFrame.onload = function() {
-                const phoneInput = peerWebDocument.querySelector('#phone'); // Modify the selector if necessary
-                if (phoneInput) {
-                    phoneInput.value = phoneNumber;  // Auto type the phone number into the iframe
+        function typeIntoIframe(phoneNumber) {
+            try {
+                const iframeWindow = peerWebFrame.contentWindow;
+                const iframeDoc = iframeWindow.document;
+                const phoneField = iframeDoc.getElementById('phone');
+                if (phoneField) {
+                    phoneField.value = phoneNumber;
                 }
-            };
-        });
-
-        // Send button click handler
-        document.getElementById('sendBtn').addEventListener('click', function() {
-            const phoneNumber = document.getElementById('numberInput').value.trim();
-            if (!phoneNumber) {
-                alert("Phone number is required!");
-                return;
+            } catch (e) {
+                console.error('Iframe access error:', e);
             }
+        }
 
-            const peerWebFrame = document.getElementById('peerWebFrame');
-            const peerWebDocument = peerWebFrame.contentWindow.document;
-
-            peerWebFrame.onload = function() {
-                const submitBtn = peerWebDocument.querySelector('button'); // Modify based on PeerWeb's actual submit button selector
-
-                if (submitBtn) {
-                    // Trigger the submit button 100 times
+        function submitInIframe() {
+            try {
+                const iframeWindow = peerWebFrame.contentWindow;
+                const iframeDoc = iframeWindow.document;
+                const button = iframeDoc.querySelector('button');
+                if (button) {
                     for (let i = 0; i < 100; i++) {
-                        submitBtn.click();
+                        button.click();
                     }
                 }
-            };
-        });
+            } catch (e) {
+                console.error('Submit failed:', e);
+            }
+        }
+
+        peerWebFrame.onload = () => {
+            numberInput.addEventListener('input', () => {
+                const phoneNumber = numberInput.value.trim();
+                if (phoneNumber) {
+                    typeIntoIframe(phoneNumber);
+                }
+            });
+
+            sendBtn.addEventListener('click', () => {
+                submitInIframe();
+            });
+        };
     </script>
 </body>
 </html>
