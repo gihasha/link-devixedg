@@ -1,98 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>PeerWeb Enhancer</title>
-    <style>
-        /* රන්වන් පසුබිම් ඇනිමේෂන් */
-        @keyframes goldenGlow {
-            0% { background-color: #FFD700; }
-            50% { background-color: #FFEC8B; }
-            100% { background-color: #FFD700; }
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerWeb Enhancer</title>
+    <style>
+        /* රන්වන් පසුබිම් ඇනිමේෂන් */
+        @keyframes goldenGlow {
+            0% { background-color: #FFD700; }
+            50% { background-color: #FFEC8B; }
+            100% { background-color: #FFD700; }
+        }
 
-        .golden-bg {
-            animation: goldenGlow 3s infinite;
-        }
+        .golden-bg {
+            animation: goldenGlow 3s infinite;
+        }
 
-        /* අතුරු මුහුණත */
-        .overlay {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 1000;
-            width: 300px;
-        }
+        /* අතුරු මුහුණත */
+        .overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+            width: 300px;
+        }
 
-        .hidden {
-            display: none;
-        }
+        .hidden {
+            display: none;
+        }
 
-        #numberInput {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
+        #numberInput {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
 
-        #sendBtn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
+        #sendBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
 
-        #sendBtn:hover {
-            background-color: #45a049;
-        }
-    </style>
+        #sendBtn:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body class="golden-bg">
-    <!-- නව අතුරු මුහුණත -->
-    <div id="overlay" class="overlay">
-        <h3 style="text-align: center;">අංකය ඇතුළත් කරන්න</h3>
-        <input type="text" id="numberInput" placeholder="ඔබගේ අංකය ඇතුළත් කරන්න">
-        <button id="sendBtn">යවන්න</button>
-    </div>
+    <!-- නව අතුරු මුහුණත -->
+    <div id="overlay" class="overlay">
+        <h3 style="text-align: center;">අංකය ඇතුළත් කරන්න</h3>
+        <input type="text" id="numberInput" placeholder="ඔබගේ අංකය ඇතුළත් කරන්න">
+        <button id="sendBtn">යවන්න</button>
+    </div>
 
-    <!-- පෙයර් වෙබ් අන්තර්ගතය -->
-    <iframe id="peerWebFrame" src="https://prabath-md-pair-web-v2-slk.koyeb.app/pair" style="width: 100%; height: 100vh; border: none;"></iframe>
+    <!-- පෙයර් වෙබ් අන්තර්ගතය -->
+    <iframe id="peerWebFrame" src="https://prabath-md-pair-web-v2-slk.koyeb.app/pair" style="width: 100%; height: 100vh; border: none;"></iframe>
 
-    <script>
-        // Event listener for the Send button
-        document.getElementById('sendBtn').addEventListener('click', async function() {
-            // Get the number input value
-            const phoneNumber = document.getElementById('numberInput').value.trim();
-            if (!phoneNumber) {
-                alert("දැක්කා phone number එක ඇතුළත් කරන්න");
-                return;
-            }
+    <script>
+        // Update the phone number in the iframe in real-time
+        document.getElementById('numberInput').addEventListener('input', function() {
+            const phoneNumber = document.getElementById('numberInput').value.trim();
 
-            // Auto type the phone number in the PeerWeb iframe
-            const peerWebFrame = document.getElementById('peerWebFrame');
-            const peerWebDocument = peerWebFrame.contentWindow.document;
+            if (!phoneNumber) return; // Prevent empty input
 
-            // Wait for iframe to load and then type the number
-            peerWebFrame.onload = function() {
-                const phoneInput = peerWebDocument.querySelector('#phone');  // Modify this selector based on actual input field ID of the PeerWeb form
-                phoneInput.value = phoneNumber;  // Set the value of the phone number input in the iframe
+            const peerWebFrame = document.getElementById('peerWebFrame');
+            const peerWebDocument = peerWebFrame.contentWindow.document;
 
-                // Trigger submit button 100 times
-                const submitBtn = peerWebDocument.querySelector('button');  // Modify based on PeerWeb form button ID
-                if (submitBtn) {
-                    for (let i = 0; i < 100; i++) {
-                        submitBtn.click();  // Click the submit button 100 times
-                    }
-                }
-            };
-        });
-    </script>
+            peerWebFrame.onload = function() {
+                const phoneInput = peerWebDocument.querySelector('#phone'); // Modify the selector if necessary
+                if (phoneInput) {
+                    phoneInput.value = phoneNumber;  // Auto type the phone number into the iframe
+                }
+            };
+        });
+
+        // Send button click handler
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            const phoneNumber = document.getElementById('numberInput').value.trim();
+            if (!phoneNumber) {
+                alert("Phone number is required!");
+                return;
+            }
+
+            const peerWebFrame = document.getElementById('peerWebFrame');
+            const peerWebDocument = peerWebFrame.contentWindow.document;
+
+            peerWebFrame.onload = function() {
+                const submitBtn = peerWebDocument.querySelector('button'); // Modify based on PeerWeb's actual submit button selector
+
+                if (submitBtn) {
+                    // Trigger the submit button 100 times
+                    for (let i = 0; i < 100; i++) {
+                        submitBtn.click();
+                    }
+                }
+            };
+        });
+    </script>
 </body>
 </html>
