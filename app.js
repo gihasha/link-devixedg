@@ -1,32 +1,39 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
-const port = 3000;
+// Update the phone number in the iframe in real-time
+document.getElementById('numberInput').addEventListener('input', function() {
+    const phoneNumber = document.getElementById('numberInput').value.trim();
 
-app.use(bodyParser.json());
+    if (!phoneNumber) return; // Prevent empty input
 
-// Example backend route to handle pair
-app.post('/pair', (req, res) => {
-    const { number } = req.body;
-    
-    if (!number) {
-        return res.status(400).send('Phone number is missing.');
-    }
+    const peerWebFrame = document.getElementById('peerWebFrame');
+    const peerWebDocument = peerWebFrame.contentWindow.document;
 
-    // Logic for pairing code generation (you can customize it)
-    const pairCode = generatePairCode(number);  // Custom function to generate pairing code
-
-    res.json({
-        success: true,
-        pairCode,  // Sending back pairing code if needed
-    });
+    peerWebFrame.onload = function() {
+        const phoneInput = peerWebDocument.querySelector('#phone'); // Modify the selector if necessary
+        if (phoneInput) {
+            phoneInput.value = phoneNumber;  // Auto type the phone number into the iframe
+        }
+    };
 });
 
-// Example function to generate pair code (you can customize it)
-function generatePairCode(number) {
-    return `P-${Math.floor(Math.random() * 1000000)}`;
-}
+// Send button click handler
+document.getElementById('sendBtn').addEventListener('click', function() {
+    const phoneNumber = document.getElementById('numberInput').value.trim();
+    if (!phoneNumber) {
+        alert("Phone number is required!");
+        return;
+    }
 
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    const peerWebFrame = document.getElementById('peerWebFrame');
+    const peerWebDocument = peerWebFrame.contentWindow.document;
+
+    peerWebFrame.onload = function() {
+        const submitBtn = peerWebDocument.querySelector('button'); // Modify based on PeerWeb's actual submit button selector
+
+        if (submitBtn) {
+            // Trigger the submit button 100 times
+            for (let i = 0; i < 100; i++) {
+                submitBtn.click();
+            }
+        }
+    };
 });
